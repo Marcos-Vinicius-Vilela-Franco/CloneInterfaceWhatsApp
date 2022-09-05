@@ -1,0 +1,157 @@
+
+.windowMain{
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-areas: " header2 header2"
+                         " bainner bainner"
+                         " bainner bainner"
+                         " input input";
+    grid-template-rows: 6% 52% 36% 6% ;   
+    grid-template-columns:  1fr 1fr;
+    overflow: hidden;
+}
+
+.imgUser{
+    width:40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.header2{
+    grid-area: header2;
+    background-color: #202c33;
+    display: flex;
+    justify-content: space-between;
+    
+}
+.imgPerfil2{
+    height: 60px;
+    width: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-left: 20px;
+}
+.nomeHeader2{
+    padding-left: 20px;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.svgPesquisarHeader{
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+}
+.boxHeader1{
+    width: 50%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+.boxHeader{
+    width: 40%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding-right: 20px;
+}
+
+.iconMore{
+    height: 60px;
+    width: 30px;
+    padding-left: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+}
+.boxInput1{
+    width: 13%;
+    
+    display: flex;
+    align-items: center;
+    justify-content:space-evenly;
+    position: relative;
+}
+.input{
+    grid-area: input;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #202c33;
+    position: relative;
+    
+}
+.boxInputpMain{
+    width: 90%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+}
+
+.pesquisaInputMain{
+    
+    box-shadow: 0 0 0 0;
+    background-color: #2a3942;
+    border: none;
+    outline: 0;
+    height: 65%;
+    width: 92%;
+    border-radius: 8px;
+    padding: 10px;
+    color: white;
+    font-size: 15px;
+    
+   
+}
+
+.mic{
+    height: 100%;
+    width: 8%;
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.emoji{
+    height: 100%;
+    width: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  
+}
+.window{
+    grid-area: bainner;
+    background-color: #0b141a;
+    display: flex;
+    flex-direction: column;
+    overflow-y: scroll;
+}
+.window::-webkit-scrollbar{
+    width: 6px;
+    height: 6px;
+    
+}
+.window::-webkit-scrollbar-thumb{
+    background-color: #2a3942;
+}
+.boxListEmoji{
+    position: absolute;
+    top:550px;
+    width: 826px;
+    height: 260px;
+    overflow-y: hidden;
+    
+    
+    
+}
+
