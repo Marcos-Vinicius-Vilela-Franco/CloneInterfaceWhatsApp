@@ -5,10 +5,11 @@ import InsertEmoticonIcon from '@mui/icons-material/InsertEmoticon';
 import SearchIcon from '@mui/icons-material/Search';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import CloseIcon from '@mui/icons-material/Close';
-import { animate, motion } from "framer-motion";
 import MessageItem from './messageItem'
 import dynamic from "next/dynamic";
+import Image from 'next/image';
 import { useState, useEffect, useRef } from 'react';
+import Api from '../api/Api';
 //-------------------SSR OFF
 const EmojiPicker = dynamic(
     () => {
@@ -17,57 +18,39 @@ const EmojiPicker = dynamic(
     { ssr: false }
 );
 
-export default function ChatW({ user }) {
-    
+export default function ChatW({ user, data }) {
+
     //----------------------------codigo microfone (start)
     let recognition = null;
-    let SpeechRecognition  = window.SpeechRecognition || window.webkitSpeechRecognition;
-    
-    if(SpeechRecognition !== undefined){
+    let SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (SpeechRecognition !== undefined) {
         recognition = new SpeechRecognition();
     }
-     //----------------------------codigo microfone (end)
+    //----------------------------codigo microfone (end)
 
-     //--------------------------------------STATES (start)
-    const body =useRef();
-     const [isOpen, setIsOpen] = useState(false);
+    //--------------------------------------STATES (start)
+    const body = useRef();
+    const [isOpen, setIsOpen] = useState(false);
     const [text, setText] = useState('');
-    const [listening,setListening]=useState(false);
-    const [list,setList]=useState([
-        {author: 123, body:"texto de exemplo para a aplicação 1"},
-        {author: 123,body:"texto de exemplo 2"},
-        {author: 1234,body:"exemplo  3"},
-        {author: 123, body:"texto de exemplo para a aplicação 2"},
-        {author: 123,body:"texto de exemplo 2"},
-        {author: 1234,body:"exemplo  3"},
-        {author: 123, body:"texto de exemplo para a aplicação 3"},
-        {author: 123,body:"texto de exemplo 2"},
-        {author: 1234,body:"exemplo  3"},
-        {author: 123, body:"texto de exemplo para a aplicação 4"},
-        {author: 123,body:"texto de exemplo 2"},
-        {author: 1234,body:"exemplo  3"},
-        {author: 123, body:"texto de exemplo para a aplicação 5"},
-        {author: 123,body:"texto de exemplo 2"},
-        {author: 1234,body:"exemplo  3"},
-        {author: 123, body:"texto de exemplo para a aplicação 6"},
-        {author: 123,body:"texto de exemplo 2"},
-        {author: 1234,body:"exemplo  3"},
-        {author: 123, body:"texto de exemplo para a aplicação 7"},
-        {author: 123,body:"texto de exemplo 2"},
-        {author: 1234,body:"exemplo  3"},
-        {author: 123, body:"texto de exemplo para a aplicação 8"},
-        {author: 123,body:"texto de exemplo 2"},
-        {author: 1234,body:"exemplo  3"}
-    ]);
+    const [listening, setListening] = useState(false);
+    const [list, setList] = useState([]);
+    const [users,setUsers] =useState([]);
     //--------------------------------------STATES (end)
+    useEffect(() => {
+        setList([]);
+        let unsub = Api.onChatContent(data.chatId, setList,setUsers);
+        return unsub;
+    }, [data.chatId])
 
-    useEffect(()=>{
-        if(body.current.scrollHeight > body.current.offsetHeight){
-           body.current.scrollTop =body.current.scrollHeight - body.current.offsetHeight; 
+
+    useEffect(() => {
+        if (body.current.scrollHeight > body.current.offsetHeight) {
+            body.current.scrollTop = body.current.scrollHeight - body.current.offsetHeight;
         }
-    },[list])
+    }, [list])
 
-
+    
     const handleOpenEmoji = () => {
         setIsOpen(true);
     }
@@ -75,18 +58,31 @@ export default function ChatW({ user }) {
     const handleEmojiClick = (e, emojiObject) => {
         setText(text + emojiObject.emoji);
     }
-
-     //----------------------------function microfone (start)
-    const handleMicClick = () =>{
-        if(recognition !== null){
+    //-Enviar messagem se tecla Enter for pressionada
+    const handleInputKeyUp = (e) => {
+        
+        if (e.keyCode == 13) {
+            handleSendClick();
+        }
+    }
+    const handleSendClick = () => {
+        if (text !== '') {
+            Api.sendMessage(data, user.id, 'text', text,users);
+            setText('');
+            setIsOpen(false);
+        }
+    }
+    //----------------------------function microfone (start)
+    const handleMicClick = () => {
+        if (recognition !== null) {
             console.log("ta auqi");
-            recognition.onstart = () =>{
+            recognition.onstart = () => {
                 setListening(true);
             }
-            recognition.onend = () =>{
+            recognition.onend = () => {
                 setListening(false);
             }
-            recognition.onresult = (e) =>{
+            recognition.onresult = (e) => {
                 setText(e.results[0][0].transcript);
             }
 
@@ -101,10 +97,12 @@ export default function ChatW({ user }) {
             < div className={style.header2}>
                 <div className={style.boxHeader1}>
                     <div className={style.imgPerfil2}>
-                        <img src="https://thumbs.dreamstime.com/b/default-avatar-profile-image-vector-social-media-user-icon-potrait-182347582.jpg" alt="user" className={style.imgUser} />
+                        <div className={style.imgUser} >
+                            <Image src={data.image} width={40} height={40} alt="User Image" />
+                        </div>
                     </div>
                     <div className={style.nomeHeader2}>
-                        <span>{user.name}</span>
+                        <span>{data.title}</span>
                     </div>
                 </div>
                 <div className={style.boxHeader}>
@@ -118,17 +116,17 @@ export default function ChatW({ user }) {
                 </div>
             </div>
             <div ref={body} className={style.window}>
-                {list.map((item,key)=>(
+                {list.map((item, key) => (
                     <MessageItem
-                    key={key}
-                    data={item}
-                    user={user}
+                        key={key}
+                        data={item}
+                        user={user}
                     />
                 ))}
 
                 <div className={style.boxListEmoji}
                     style={{ display: isOpen ? '' : 'none' }}
-                    >
+                >
                     < EmojiPicker disableSearchBar disableSkinTonePicker
                         pickerStyle={{ width: 'auto', boxShadow: 'none', border: 'none' }}
                         onEmojiClick={handleEmojiClick} />
@@ -153,13 +151,15 @@ export default function ChatW({ user }) {
                         placeholder="Mensagem "
                         className={style.pesquisaInputMain}
                         value={text}
-                        onChange={e => setText(e.target.value)} />
+                        onChange={e => setText(e.target.value)}
+                        onKeyUp={handleInputKeyUp}
+                    />
                     <div className={style.mic}>
                         {text === '' ?
                             <div onClick={handleMicClick} className={style.emoji}>
                                 <MicIcon style={{ color: listening ? "#126ece" : 'white' }} />
-                            </div> : 
-                            <div className={style.emoji}>
+                            </div> :
+                            <div className={style.emoji} onClick={handleSendClick}>
                                 <SendIcon style={{ color: 'white' }} />
                             </div>}
                     </div>

@@ -3,41 +3,53 @@ import SearchIcon from '@mui/icons-material/Search';
 import ChatIcon from '@mui/icons-material/Chat';
 import DonutLargeIcon from '@mui/icons-material/DonutLarge';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Chatlist from '../components/Chatlist';
 import Intro from '../components/chatIntro';
 import Chatwindow from '../components/chatWindow';
 import NewChat from '../components/newChat';
+import Login from '../components/Login';
+import Api from '../api/Api';
 
 
 
 export default function Home() {
-    
-    const [chatList, setChatList] = useState([
-        { chatId: 1, title: 'Claudio', image: "https://thumbs.dreamstime.com/b/default-avatar-profile-image-vector-social-media-user-icon-potrait-182347582.jpg" },
-        { chatId: 2, title: 'Marcos', image: "https://thumbs.dreamstime.com/b/default-avatar-profile-image-vector-social-media-user-icon-potrait-182347582.jpg" },
-        { chatId: 3, title: 'Adeir', image: "https://thumbs.dreamstime.com/b/default-avatar-profile-image-vector-social-media-user-icon-potrait-182347582.jpg" },
-        { chatId: 4, title: 'Fausto Silva', image: "https://thumbs.dreamstime.com/b/default-avatar-profile-image-vector-social-media-user-icon-potrait-182347582.jpg" },
-        { chatId: 5, title: 'Manoel', image: "https://thumbs.dreamstime.com/b/default-avatar-profile-image-vector-social-media-user-icon-potrait-182347582.jpg" },
-        { chatId: 6, title: 'Amavelino', image: "https://thumbs.dreamstime.com/b/default-avatar-profile-image-vector-social-media-user-icon-potrait-182347582.jpg" },
 
-    ]);
+    const [chatList, setChatList] = useState([]);
     const [activeChat, setActiveChat] = useState({});
-    const[showNweChat,setShowNewChat]=useState(false);
-    const [user,setUser]=useState({
-        id:1234,
-        avatar:"https://thumbs.dreamstime.com/b/default-avatar-profile-image-vector-social-media-user-icon-potrait-182347582.jpg",
-        name:"Marcos Vinicius"
-    })
+    const [showNweChat, setShowNewChat] = useState(false);
+    const [user, setUser] = useState(null);
+
+
+    useEffect(() => {
+        if (user !== null) {
+           let unsub =  Api.onChatList(user.id, setChatList);
+            return unsub;
+        }
+    }, [user])
+    const handleLoginData = async (user) => {
+        let newUser = {
+            id: user.uid,
+            name: user.displayName,
+            avatar: user.photoURL
+        };
+        await Api.addUser(newUser);
+
+        setUser(newUser);
+    }
+    if (user === null) {
+        return (<Login onReceive={handleLoginData} />);
+    }
+
     return (
         <div className={style.center}>
             <div className={style.corpo}>
                 <NewChat
-                 chatlist={chatList}
-                 user={user}
-                 show={showNweChat} 
-                 setShow={setShowNewChat}
-                 />
+                    chatlist={chatList}
+                    user={user}
+                    show={showNweChat}
+                    setShow={setShowNewChat}
+                />
                 <div className={style.header}>
 
                     <div className={style.imgBox}>
@@ -47,7 +59,7 @@ export default function Home() {
                         <div className={style.icons}>
                             <DonutLargeIcon style={{ color: 'white' }} />
                         </div>
-                        <div className={style.icons} onClick={()=>setShowNewChat(true)}>
+                        <div className={style.icons} onClick={() => setShowNewChat(true)}>
                             <ChatIcon style={{ color: 'white' }} />
                         </div>
                         <div className={style.icons}>
@@ -69,14 +81,14 @@ export default function Home() {
                             active={activeChat.chatId === chatList[key].chatId}
                             data={item}
                             onClick={() => setActiveChat(chatList[key])}
-                             />
+                        />
                     ))}
 
                 </div>
 
                 <div className={style.intro}>
-                    {activeChat.chatId !== undefined && <Chatwindow  user={user}/> }
-                    
+                    {activeChat.chatId !== undefined && <Chatwindow user={user} data={activeChat}/>}
+
                     {activeChat.chatId === undefined && <Intro />}
                 </div>
 
