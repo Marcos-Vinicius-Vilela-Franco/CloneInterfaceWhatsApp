@@ -3,11 +3,16 @@ import 'firebase/compat/auth';
 import 'firebase/compat/firestore';
 import firebaseConfig from '../firebase/config';
 
+
 const firebaseApp = firebase.initializeApp(firebaseConfig);
 
 const db = firebaseApp.firestore();
 
 export default {
+
+    logout: async () => {
+        await firebase.auth().signOut();
+    },
     fbPopup: async () => {
         const provider = new firebase.auth.FacebookAuthProvider();
         let result = await firebaseApp.auth().signInWithPopup(provider);
@@ -69,10 +74,10 @@ export default {
                 if (data.chats) {
                     let chats = [...data.chats];
                     chats.sort((a, b) => {
-                        if (a.lastMessageDate === undefined){
+                        if (a.lastMessageDate === undefined) {
                             return -1;
                         }
-                        if(b.lastMessageDate === undefined) {
+                        if (b.lastMessageDate === undefined) {
                             return -1;
                         }
                         if (a.lastMessageDate.seconds < b.lastMessageDate.seconds) {

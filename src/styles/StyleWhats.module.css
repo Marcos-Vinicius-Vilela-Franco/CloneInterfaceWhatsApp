@@ -43,7 +43,7 @@
     width: 150px;
     display: flex;
     align-items: center;
-    justify-content: space-around;
+    justify-content:flex-end;
 }
 .imgBox{
     width: 60px;
@@ -100,7 +100,6 @@
     
 } 
 
-    
 
 .pesquisaInput{
     margin-right: 10px;
@@ -121,6 +120,7 @@
 
 .icons{
     cursor: pointer;
+    margin: 15px;
 }
 
 

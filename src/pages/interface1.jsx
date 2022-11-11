@@ -10,8 +10,7 @@ import Chatwindow from '../components/chatWindow';
 import NewChat from '../components/newChat';
 import Login from '../components/Login';
 import Api from '../api/Api';
-
-
+import LogoutIcon from '@mui/icons-material/Logout';
 
 export default function Home() {
 
@@ -19,8 +18,7 @@ export default function Home() {
     const [activeChat, setActiveChat] = useState({});
     const [showNweChat, setShowNewChat] = useState(false);
     const [user, setUser] = useState(null);
-
-
+      
     useEffect(() => {
         if (user !== null) {
            let unsub =  Api.onChatList(user.id, setChatList);
@@ -28,19 +26,25 @@ export default function Home() {
         }
     }, [user])
     const handleLoginData = async (user) => {
+        const token = await user.getIdToken();
         let newUser = {
             id: user.uid,
             name: user.displayName,
-            avatar: user.photoURL
+            avatar: user.photoURL,
+            token
         };
         await Api.addUser(newUser);
-
         setUser(newUser);
     }
-    if (user === null) {
+   
+    if (user === null ) {
         return (<Login onReceive={handleLoginData} />);
     }
-
+    function logout(){
+        Api.logout();
+        setUser(null);
+        console.log("ta aqui")
+    }
     return (
         <div className={style.center}>
             <div className={style.corpo}>
@@ -56,14 +60,14 @@ export default function Home() {
                         <img src={user.avatar} alt="user" className={style.imgUser} />
                     </div>
                     <div className={style.iconsGroup}>
-                        <div className={style.icons}>
+                        {/* <div className={style.icons}>
                             <DonutLargeIcon style={{ color: 'white' }} />
-                        </div>
+                        </div> */}
                         <div className={style.icons} onClick={() => setShowNewChat(true)}>
                             <ChatIcon style={{ color: 'white' }} />
                         </div>
-                        <div className={style.icons}>
-                            <MoreVertIcon style={{ color: 'white' }} />
+                        <div className={style.icons} onClick={logout}>
+                            <LogoutIcon style={{ color: 'white' }} />
                         </div>
                     </div>
                 </div>
